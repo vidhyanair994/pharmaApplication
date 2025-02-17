@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive  # Set to reactive for Spring Cloud Gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: pharma-service
+          uri: lb://PHARMA-SERVICE  # Load-balanced URI for the pharma service (Eureka)
+          predicates:
+            - Path=/batch/**  # This path will be routed to the Pharma service
+          filters:
+            - name: RequestHeaderToRequestUri
+              args:
+                name: X-Request-Uri
+            - name: CircuitBreaker
+              args:
+                name: pharmaServiceCircuitBreaker
+                fallbackUri: forward:/fallback  # Fallback URI when service is down or circuit is open
+
+        # Fallback route definition
+        - id: fallback-service
+          uri: "forward:/fallback"  # Forward to a fallback method
+          predicates:
+            - Path=/fallback  # This will catch requests when the circuit breaker is triggered
+          
+  eureka:
+    client:
+      register-with-eureka: true
+      fetch-registry: true
+      service-url:
+        defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+    instance:
+      hostname: localhost
+      port: 8081
+      health-check-url-path: /actuator/health  # Health check endpoint
+
+  resilience4j:
+      circuitbreaker:
+        instances:
+          pharmaServiceCircuitBreaker:
+            registerHealthIndicator: true
+            failureRateThreshold: 50
+            slidingWindowSize: 100
+            waitDurationInOpenState: 5000ms
+            permittedNumberOfCallsInHalfOpenState: 10
+            minimumNumberOfCalls: 10
+server:
+  port: 8081  # API Gateway port
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"  # Expose health and info endpoints for monitoring

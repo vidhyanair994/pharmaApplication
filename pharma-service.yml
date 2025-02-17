@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: PHARMA-SERVICE
+  server:
+    port: 8080
+  datasource:
+    url: jdbc:h2:mem:pharma
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    sql:
+      init:
+        mode: always
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  thymeleaf:
+    enabled: false
+  servlet:
+    register-default-servlet: true
+
+# Eureka client configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initial-registry-fetch-delay-seconds: 0
+    registry-fetch-interval-seconds: 5
+    registry-refresh-interval-seconds: 30
+  instance:
+    health-check-url-path: /actuator/health
+    hostname: localhost
+    port: 8080
+
+# Enable Health Checks
+  client:
+    healthcheck:
+      enabled: true
+
+# Resilience4J Circuit Breaker Configuration (for individual methods like batch operations)
+resilience4j:
+  circuitbreaker:
+    instances:
+      addBatchCircuitBreaker:
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 10
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+
+      updateBatchCircuitBreaker:
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 10
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+
+      deleteBatchCircuitBreaker:
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 10
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
