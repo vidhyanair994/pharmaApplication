@@ -3,19 +3,6 @@ spring:
     name: pharma-service
   server:
     port: 8080
-  datasource:
-    url: jdbc:h2:mem:pharma
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    sql:
-      init:
-        mode: always
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: update
   mvc:
     view:
       prefix: /WEB-INF/jsp/
