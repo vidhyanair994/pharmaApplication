@@ -1,10 +1,11 @@
 server:
-  port: 8888  
+  port: 8888  # Ensure that the Config Server is running on this port
 
 spring:
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/vidhyanair994/pharmaApplication 
-          clone-on-start: true
+          uri: http://github.com/vidhyanair994/pharmaApplication  # GitHub repo URL
+          searchPaths: /  # Search at the root of the repository
+          ignoreLocalSslVerification: true  # If needed, for SSL verification in local testing
